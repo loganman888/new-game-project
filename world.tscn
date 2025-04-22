@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://c7b0ynxnqcvrt"]
+[gd_scene load_steps=23 format=3 uid="uid://c7b0ynxnqcvrt"]
 
 [ext_resource type="PackedScene" uid="uid://tavvx0k43s2n" path="res://player.tscn" id="1_gbfbk"]
 [ext_resource type="PackedScene" uid="uid://d35wt21sv026p" path="res://enemy.tscn" id="2_fj7yv"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://cs10owbqkjdab" path="res://turret_menu_ui.tscn" id="10_wse8f"]
 [ext_resource type="PackedScene" uid="uid://df152xnsqmp14" path="res://rapid_turret.tscn" id="11_ic0uy"]
 [ext_resource type="PackedScene" uid="uid://c66wwcmtmi5wj" path="res://slow_turret.tscn" id="12_k3n1d"]
+[ext_resource type="PackedScene" uid="uid://bvvfk055lh5te" path="res://teleporter.tscn" id="13_2o6r5"]
 
 [sub_resource type="GDScript" id="GDScript_ioo17"]
 
@@ -132,6 +133,10 @@ transform = Transform3D(-2.98023e-07, 2.36042e-07, 22.528, -3.55271e-15, -2.7, 1
 transform = Transform3D(-38.94, -1.90261e-13, -7.2294e-06, -1.38343e-13, -2.43, 1.24077e-06, -1.33071e-05, 2.12437e-07, 14.1927, -99.8158, 0.785, -19.2994)
 size = Vector3(1.14795, 2, 1.52148)
 
+[node name="CSGBox3D19" type="CSGBox3D" parent="Map/NavigationRegion3D/CSGCombiner3D"]
+transform = Transform3D(-38.94, -1.90261e-13, -7.2294e-06, -1.38343e-13, -2.43, 1.24077e-06, -1.33071e-05, 2.12437e-07, 14.1927, -96.8158, 0.785, 18.7006)
+size = Vector3(1.14795, 2, 1.52148)
+
 [node name="Enemy2" parent="." instance=ExtResource("2_fj7yv")]
 transform = Transform3D(1, 0, 0, 0, 1.3, 0, 0, 0, 1, -125, 12, 2)
 
@@ -195,3 +200,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90.0908, 14.3457, -10.0617)
 
 [node name="SlowTurret" parent="." instance=ExtResource("12_k3n1d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95, 15, -9)
+
+[node name="Teleporter1" parent="." instance=ExtResource("13_2o6r5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91, 15, 13)
+target_teleporter = NodePath("../Teleporter2")
+
+[node name="Teleporter2" parent="." instance=ExtResource("13_2o6r5")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -85, 15, -21)
+target_teleporter = NodePath("../Teleporter1")
