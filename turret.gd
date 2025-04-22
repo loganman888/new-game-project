@@ -2,7 +2,7 @@
 extends Node3D
 
 # Export variables for turret configuration
-@export var attack_range: float = 11.0
+@export var attack_range: float = 10.0
 @export var attack_cooldown: float = .5
 @export var damage: float = 50
 @export var projectile_speed: float = 20.0
