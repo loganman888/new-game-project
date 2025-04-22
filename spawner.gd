@@ -1,4 +1,3 @@
-# spawner.gd
 extends Node3D
 
 @export var enemy_scenes: Array[PackedScene]
@@ -6,8 +5,10 @@ extends Node3D
 @export var max_enemies: int = 10
 @export var target: Node3D
 @export var spawn_radius: float = 5.0
+@export var initial_spawn_delay: float = 3.0  # Delay before spawning starts
 
 var spawn_timer: Timer
+var delay_timer: Timer
 
 func _ready() -> void:
 	print("\n=== Spawner Initialization ===")
@@ -25,15 +26,22 @@ func _ready() -> void:
 			push_error("No target assigned to spawner!")
 			return
 	
-	# Create and setup timer
+	# Create and setup spawn timer
 	spawn_timer = Timer.new()
 	spawn_timer.wait_time = spawn_interval
 	spawn_timer.one_shot = false
 	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
 	add_child(spawn_timer)
 	
-	# Start spawning
-	_start_spawning()
+	# Create and setup delay timer
+	delay_timer = Timer.new()
+	delay_timer.wait_time = initial_spawn_delay
+	delay_timer.one_shot = true
+	delay_timer.timeout.connect(_start_spawning)
+	add_child(delay_timer)
+	
+	# Start delay timer
+	delay_timer.start()
 
 func _start_spawning() -> void:
 	spawn_timer.start()
