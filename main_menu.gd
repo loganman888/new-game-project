@@ -17,5 +17,7 @@ func _on_start_pressed() -> void:
 
 
 
-func _on_exit_pressed() -> void:
-	get_tree().quit()
+
+func _on_settings_button_pressed() -> void:
+	var settings = preload("res://settings.tscn").instantiate()
+	add_child(settings)
