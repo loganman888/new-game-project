@@ -1,0 +1,170 @@
+extends Node3D
+
+# Export variables for turret configuration
+@export var effect_range: float = 10.0
+@export var damage_per_second: float = 20.0  # Amount of damage per second to apply
+@export var range_indicator_color: Color = Color(1.0, 0.2, 0.0, 0.3)  # Reddish, semi-transparent
+
+# Node references
+@onready var rotation_base = $RotationBase
+@onready var turret_model = $RotationBase/TurretModel
+@onready var detection_area = $DetectionArea
+@onready var pickup_area = $PickupDetectionArea
+
+# State variables
+var is_active: bool = true
+var is_preview: bool = false
+var original_materials: Dictionary = {}
+var range_indicator: MeshInstance3D
+
+# Visual effect variables
+var pulse_time: float = 0.0
+var pulse_speed: float = 3.0
+var pulse_strength: float = 0.2
+
+func _ready() -> void:
+	add_to_group("turrets")
+	
+	# Setup detection area
+	if detection_area:
+		detection_area.collision_layer = 8   # Layer 4 (Turret)
+		detection_area.collision_mask = 4    # Layer 3 (Enemy)
+		var collision_shape = detection_area.get_node("CollisionShape3D")
+		if collision_shape:
+			var sphere_shape = SphereShape3D.new()
+			sphere_shape.radius = effect_range
+			collision_shape.shape = sphere_shape
+	
+	# Setup pickup detection area
+	if pickup_area:
+		pickup_area.collision_layer = 32  # Layer 6 (Pickup)
+		pickup_area.collision_mask = 32   # Layer 6 (Pickup)
+		pickup_area.monitoring = true
+		pickup_area.monitorable = true
+		var collision_shape = pickup_area.get_node("CollisionShape3D")
+		if collision_shape:
+			var sphere_shape = SphereShape3D.new()
+			sphere_shape.radius = 2.0
+			collision_shape.shape = sphere_shape
+			collision_shape.disabled = false
+	
+	# Create range indicator
+	create_range_indicator()
+
+func create_range_indicator() -> void:
+	range_indicator = MeshInstance3D.new()
+	add_child(range_indicator)
+	range_indicator.name = "RangeIndicator"
+	setup_range_indicator()
+	range_indicator.visible = false
+
+func setup_range_indicator() -> void:
+	var sphere_mesh = SphereMesh.new()
+	sphere_mesh.radius = effect_range
+	sphere_mesh.height = effect_range * 2  # Sphere height should be double the radius
+	sphere_mesh.radial_segments = 32
+	sphere_mesh.rings = 16
+	range_indicator.mesh = sphere_mesh
+	
+	var material = StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = range_indicator_color
+	material.emission_enabled = true
+	material.emission = range_indicator_color
+	material.emission_energy_multiplier = 1.5
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	range_indicator.material_override = material
+	range_indicator.position = Vector3.ZERO
+
+func _process(delta: float) -> void:
+	if !is_active or is_preview:
+		# Pulse effect for range indicator during preview
+		if range_indicator and range_indicator.visible:
+			pulse_time += delta * pulse_speed
+			var pulse = (sin(pulse_time) * pulse_strength) + 1.0
+			range_indicator.scale = Vector3.ONE * pulse
+			
+			# Update transparency based on pulse
+			var material = range_indicator.material_override as StandardMaterial3D
+			if material:
+				var alpha = range_indicator_color.a * (0.8 + (sin(pulse_time) * 0.2))
+				material.albedo_color.a = alpha
+		return
+	
+	# Deal DoT to enemies in detection area
+	apply_damage_to_enemies(delta)
+
+func apply_damage_to_enemies(delta: float) -> void:
+	if !detection_area or !detection_area.monitoring:
+		return
+		
+	var bodies = detection_area.get_overlapping_bodies()
+	for body in bodies:
+		if is_instance_valid(body) and body.is_in_group("enemies"):
+			if body.has_method("apply_damage"):
+				body.apply_damage(damage_per_second * delta)
+
+func set_preview(enable: bool) -> void:
+	is_preview = enable
+	if is_preview:
+		store_original_materials_recursive(self)
+		set_active(false)
+		visible = true
+		if range_indicator:
+			range_indicator.visible = true
+	else:
+		restore_original_materials_recursive(self)
+		clear_all_preview_materials()
+		if range_indicator:
+			range_indicator.visible = false
+
+func set_active(active: bool) -> void:
+	is_active = active
+	visible = true
+	set_process(active)
+	set_physics_process(active)
+	
+	if detection_area:
+		detection_area.monitoring = active
+		detection_area.monitorable = active
+	
+	if pickup_area:
+		pickup_area.monitoring = true
+		pickup_area.monitorable = true
+
+func update_preview_material(material: StandardMaterial3D) -> void:
+	if is_preview:
+		apply_preview_material_recursive(self, material)
+		visible = true
+
+func apply_preview_material_recursive(node: Node, material: StandardMaterial3D) -> void:
+	if node is MeshInstance3D and node != range_indicator:
+		if !original_materials.has(node):
+			original_materials[node] = node.get_surface_override_material(0)
+		node.material_override = material
+		node.visible = true
+	
+	for child in node.get_children():
+		apply_preview_material_recursive(child, material)
+
+func store_original_materials_recursive(node: Node) -> void:
+	if node is MeshInstance3D and node != range_indicator:
+		original_materials[node] = node.get_surface_override_material(0)
+		node.visible = true
+	
+	for child in node.get_children():
+		store_original_materials_recursive(child)
+
+func restore_original_materials_recursive(node: Node) -> void:
+	if node is MeshInstance3D and node != range_indicator:
+		if original_materials.has(node):
+			node.material_override = original_materials[node]
+		else:
+			node.material_override = null
+		node.visible = true
+	
+	for child in node.get_children():
+		restore_original_materials_recursive(child)
+
+func clear_all_preview_materials() -> void:
+	original_materials.clear()

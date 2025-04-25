@@ -140,3 +140,9 @@ func on_damage(attack: Attack) -> void:
 func on_death() -> void:
 	ScoreManager.add_score(SCORE_VALUE)
 	queue_free()
+	
+	
+func apply_damage(amount: float) -> void:
+	if health_component:
+		health_component.damage(Attack.new(amount, self))
+		on_damage(Attack.new(amount, self))

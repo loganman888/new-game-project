@@ -1,11 +1,14 @@
-[gd_scene load_steps=8 format=3 uid="uid://bcau8p5se2yi1"]
+[gd_scene load_steps=12 format=3 uid="uid://bcau8p5se2yi1"]
 
 [ext_resource type="PackedScene" uid="uid://tavvx0k43s2n" path="res://player.tscn" id="1_c7s6e"]
+[ext_resource type="Texture2D" uid="uid://ce2gag213v2kx" path="res://assets/696.jpg" id="1_iw27f"]
 [ext_resource type="PackedScene" uid="uid://d1v11i55ngi4a" path="res://dummy.tscn" id="2_wijl4"]
 [ext_resource type="PackedScene" uid="uid://b7q3yflfn6lis" path="res://spawner.tscn" id="3_e0an3"]
 [ext_resource type="PackedScene" uid="uid://cs10owbqkjdab" path="res://turret_menu_ui.tscn" id="4_p5pve"]
-
-[sub_resource type="Environment" id="Environment_c7s6e"]
+[ext_resource type="PackedScene" uid="uid://byxx4crr268hw" path="res://pause_menu.tscn" id="5_urblq"]
+[ext_resource type="PackedScene" uid="uid://c065s3htgr1ld" path="res://day_night_cycle.tscn" id="7_71pa8"]
+[ext_resource type="PackedScene" uid="uid://bvvfk055lh5te" path="res://teleporter.tscn" id="8_05x41"]
+[ext_resource type="PackedScene" uid="uid://crb75x2ibkikd" path="res://score_ui.tscn" id="9_gqbix"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_e0an3"]
 vertices = PackedVector3Array(-24, 1.41918, -33.0638, -16, 1.41918, -33.0638, -16, 1.41918, -47.0638, -26, 1.41918, -31.0638, -54, 1.41918, -47.0638, -54, 1.41918, 47.9362, -26, 1.41918, 47.9362, 31, 1.41918, -33.0638, 31, 1.41918, -47.0638, -20, 3.41918, 47.9362, 54, 3.41918, 47.9362, -17, 3.41918, 46.9362, -19, 3.41918, 44.9362, 38, 3.41918, -26.0638, 38, 3.41918, -47.0638, 37, 3.41918, -29.0638, 35, 3.41918, -27.0638, -17, 3.41918, -26.0638, -20, 3.41918, -27.0638, -19, 3.41918, -24.0638, 47, 1.41918, -47.0638, 44, 1.41918, -47.0638, 44, 1.41918, -22.0638, 47, 1.41918, -15.0638, -13, 1.41918, 40.9362, -2, 1.41918, 34.9362, -2, 1.41918, -13.0638, -13, 1.41918, -20.0638, 42, 1.41918, -20.0638, 0, 1.41918, -15.0638, 0, 1.41918, 36.9362, 54, 1.41918, 40.9362, 54, 1.41918, 36.9362, 4, 3.41918, 30.9362, 54, 3.41918, 30.9362, 7, 3.41918, 29.9362, 5, 3.41918, 27.9362, 54, 3.41918, -8.06377, 54, 3.41918, -47.0638, 53, 3.41918, -11.0638, 51, 3.41918, -9.06377, 4, 3.41918, -9.06377, 5, 3.41918, -6.06377, 7, 3.41918, -8.06377, 11, 1.41918, -2.06377, 11, 1.41918, 23.9362, 54, 1.41918, 23.9362, 54, 1.41918, -2.06377)
@@ -16,12 +19,10 @@ border_size = 1.0
 agent_radius = 3.0
 agent_max_climb = 0.5
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c7s6e"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_71pa8"]
+albedo_texture = ExtResource("1_iw27f")
 
 [node name="Map" type="Node3D"]
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_c7s6e")
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
 navigation_mesh = SubResource("NavigationMesh_e0an3")
@@ -32,7 +33,7 @@ use_collision = true
 [node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D"]
 transform = Transform3D(28.5, 0, 0, 0, 0.1, 0, 0, 0, 14.4144, 0, 0, 0.408085)
 size = Vector3(4, 1, 7)
-material = SubResource("StandardMaterial3D_c7s6e")
+material = SubResource("StandardMaterial3D_71pa8")
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D"]
 transform = Transform3D(-1.70789e-06, -1.63004e-15, -6.02, 9.53674e-07, 1.9, 0, 39.072, 2.98023e-08, -2.63143e-07, 54, 1, -30.5278)
@@ -69,10 +70,7 @@ transform = Transform3D(-39.072, -2.98023e-08, 5.26285e-07, 9.53674e-07, 1.9, 2.
 size = Vector3(1.27197, 1, 1)
 
 [node name="player" parent="." instance=ExtResource("1_c7s6e")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 7, -5)
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.965926, 0.258819, 3.61644e-15, 1.13133e-08, -4.2222e-08, 1, 0.258819, -0.965926, -4.37114e-08, 0, 57, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 2.36126, -8)
 
 [node name="dummy" parent="." instance=ExtResource("2_wijl4")]
 transform = Transform3D(-0.528, 0, 0, 0, 1, 0, 0, 0, 1, 55, 0, 40)
@@ -82,4 +80,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.1, 44, 1, -43)
 spawn_interval = 2.0
 spawn_radius = 2.0
 
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="PauseMenu" parent="." instance=ExtResource("5_urblq")]
+
 [node name="TurretMenuUI" parent="." instance=ExtResource("4_p5pve")]
+
+[node name="DayNightCycle" parent="." instance=ExtResource("7_71pa8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 66.292, 0)
+
+[node name="Teleporter1" parent="." instance=ExtResource("8_05x41")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 4, 33)
+target_teleporter = NodePath("../Teleporter2")
+
+[node name="Teleporter2" parent="." instance=ExtResource("8_05x41")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 3, -7)
+target_teleporter = NodePath("../Teleporter1")
+
+[node name="ScoreUi" parent="." instance=ExtResource("9_gqbix")]

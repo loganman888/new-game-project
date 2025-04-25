@@ -4,7 +4,7 @@ extends Node
 signal score_changed(new_score: int)
 signal purchase_failed
 
-var current_score: int = 100  # Start with 100 points
+var current_score: int = 500  # Start with 500 points
 
 func _ready() -> void:
 	# Emit initial score

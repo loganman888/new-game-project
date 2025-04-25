@@ -4,7 +4,7 @@ extends CanvasLayer
 
 func _ready() -> void:
 	# Set up initial label properties
-	score_label.text = "Score: 100"
+	score_label.text = "Score: 500"
 	score_label.add_theme_font_size_override("font_size", 24)
 	
 	# Position the label in the top-right corner

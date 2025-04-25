@@ -1,4 +1,3 @@
-# turret_menu_ui.gd
 extends Control
 
 @onready var grid_container = $Panel/GridContainer
@@ -6,7 +5,8 @@ var pickup_system: Node
 
 const BASIC_TURRET_COST = 50
 const RAPID_TURRET_COST = 75
-const SLOW_TURRET_COST = 100  # Add cost for slow turret
+const SLOW_TURRET_COST = 100
+const DOT_TURRET_COST = 120 # Add cost for DOT turret
 
 var turret_types = {
 	"Basic Turret": {
@@ -17,9 +17,13 @@ var turret_types = {
 		"scene": preload("res://rapid_turret.tscn"),
 		"cost": RAPID_TURRET_COST
 	},
-	"Slow Turret": {  # Add slow turret entry
+	"Slow Turret": {
 		"scene": preload("res://slow_turret.tscn"),
 		"cost": SLOW_TURRET_COST
+	},
+	"DOT Turret": { # Add DOT turret entry
+		"scene": preload("res://dot_turret.tscn"),  # <--- SET THIS PATH CORRECTLY!
+		"cost": DOT_TURRET_COST
 	}
 }
 

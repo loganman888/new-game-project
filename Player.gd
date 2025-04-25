@@ -132,4 +132,4 @@ func on_death() -> void:
 	get_tree().quit()
 
 func calculate_gravity() -> Vector3:
-	return Vector3(0, -gravity, 0) 
+	return Vector3(0, -gravity, 0)
