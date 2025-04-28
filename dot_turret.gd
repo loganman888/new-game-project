@@ -4,12 +4,17 @@ extends Node3D
 @export var effect_range: float = 10.0
 @export var damage_per_second: float = 20.0  # Amount of damage per second to apply
 @export var range_indicator_color: Color = Color(1.0, 0.2, 0.0, 0.3)  # Reddish, semi-transparent
+@export var shop_type: String = "DOT Turret"
+@export var shop_cost: int = 120
 
 # Node references
 @onready var rotation_base = $RotationBase
 @onready var turret_model = $RotationBase/TurretModel
 @onready var detection_area = $DetectionArea
 @onready var pickup_area = $PickupDetectionArea
+
+# PLATFORM SUPPORT
+var platform: Node = null
 
 # State variables
 var is_active: bool = true
@@ -104,9 +109,14 @@ func apply_damage_to_enemies(delta: float) -> void:
 			if body.has_method("apply_damage"):
 				body.apply_damage(damage_per_second * delta)
 
+# PLATFORM LOGIC
 func set_preview(enable: bool) -> void:
 	is_preview = enable
 	if is_preview:
+		if platform:
+			if platform.has_method("remove_turret"):
+				platform.remove_turret()
+			platform = null
 		store_original_materials_recursive(self)
 		set_active(false)
 		visible = true

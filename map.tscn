@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bcau8p5se2yi1"]
+[gd_scene load_steps=13 format=3 uid="uid://bcau8p5se2yi1"]
 
 [ext_resource type="PackedScene" uid="uid://tavvx0k43s2n" path="res://player.tscn" id="1_c7s6e"]
 [ext_resource type="Texture2D" uid="uid://ce2gag213v2kx" path="res://assets/696.jpg" id="1_iw27f"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://c065s3htgr1ld" path="res://day_night_cycle.tscn" id="7_71pa8"]
 [ext_resource type="PackedScene" uid="uid://bvvfk055lh5te" path="res://teleporter.tscn" id="8_05x41"]
 [ext_resource type="PackedScene" uid="uid://crb75x2ibkikd" path="res://score_ui.tscn" id="9_gqbix"]
+[ext_resource type="PackedScene" uid="uid://dswf11hjr8klc" path="res://turret_platform.tscn" id="10_oysan"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_e0an3"]
 vertices = PackedVector3Array(-24, 1.41918, -33.0638, -16, 1.41918, -33.0638, -16, 1.41918, -47.0638, -26, 1.41918, -31.0638, -54, 1.41918, -47.0638, -54, 1.41918, 47.9362, -26, 1.41918, 47.9362, 31, 1.41918, -33.0638, 31, 1.41918, -47.0638, -20, 3.41918, 47.9362, 54, 3.41918, 47.9362, -17, 3.41918, 46.9362, -19, 3.41918, 44.9362, 38, 3.41918, -26.0638, 38, 3.41918, -47.0638, 37, 3.41918, -29.0638, 35, 3.41918, -27.0638, -17, 3.41918, -26.0638, -20, 3.41918, -27.0638, -19, 3.41918, -24.0638, 47, 1.41918, -47.0638, 44, 1.41918, -47.0638, 44, 1.41918, -22.0638, 47, 1.41918, -15.0638, -13, 1.41918, 40.9362, -2, 1.41918, 34.9362, -2, 1.41918, -13.0638, -13, 1.41918, -20.0638, 42, 1.41918, -20.0638, 0, 1.41918, -15.0638, 0, 1.41918, 36.9362, 54, 1.41918, 40.9362, 54, 1.41918, 36.9362, 4, 3.41918, 30.9362, 54, 3.41918, 30.9362, 7, 3.41918, 29.9362, 5, 3.41918, 27.9362, 54, 3.41918, -8.06377, 54, 3.41918, -47.0638, 53, 3.41918, -11.0638, 51, 3.41918, -9.06377, 4, 3.41918, -9.06377, 5, 3.41918, -6.06377, 7, 3.41918, -8.06377, 11, 1.41918, -2.06377, 11, 1.41918, 23.9362, 54, 1.41918, 23.9362, 54, 1.41918, -2.06377)
@@ -98,3 +99,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 3, -7)
 target_teleporter = NodePath("../Teleporter1")
 
 [node name="ScoreUi" parent="." instance=ExtResource("9_gqbix")]
+
+[node name="TurretPlatform" parent="." instance=ExtResource("10_oysan")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 2.2334, -10.6599)
+snap_point = Vector3(0, 1, 0)
+
+[node name="TurretPlatform2" parent="." instance=ExtResource("10_oysan")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2.2334, -10.6599)
+snap_point = Vector3(0, 1, 0)

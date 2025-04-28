@@ -1,4 +1,4 @@
-# turret.gd - Working version
+# turret.gd - Working version with platform support
 extends Node3D
 
 # Export variables for turret configuration
@@ -7,6 +7,8 @@ extends Node3D
 @export var damage: float = 5
 @export var projectile_speed: float = 20.0
 @export var rotation_speed: float = 5.0
+@export var shop_type: String = "Rapid Turret"
+@export var shop_cost: int = 75
 
 # Node references
 @onready var rotation_base = $RotationBase
@@ -24,6 +26,9 @@ var can_attack: bool = true
 var is_active: bool = true
 var is_preview: bool = false
 var original_materials: Dictionary = {}
+
+# PLATFORM SUPPORT
+var platform: Node = null
 
 func _ready() -> void:
 	add_to_group("turrets")
@@ -77,9 +82,14 @@ func _process(delta: float) -> void:
 		if can_attack:
 			shoot_at_target()
 
+# PLATFORM LOGIC here (matches your other turret version)
 func set_preview(enable: bool) -> void:
 	is_preview = enable
 	if is_preview:
+		if platform:
+			if platform.has_method("remove_turret"):
+				platform.remove_turret()
+			platform = null
 		store_original_materials_recursive(self)
 		set_active(false)
 		visible = true

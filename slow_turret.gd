@@ -4,6 +4,8 @@ extends Node3D
 @export var effect_range: float = 10.0
 @export var slow_factor: float = 0.5  # How much to slow enemies (0.5 = 50% slower)
 @export var range_indicator_color: Color = Color(0.0, 0.7, 1.0, 0.3)  # Blue, semi-transparent
+@export var shop_type: String = "Slow Turret"
+@export var shop_cost: int = 100
 
 # Node references
 @onready var rotation_base = $RotationBase
@@ -22,6 +24,9 @@ var range_indicator: MeshInstance3D
 var pulse_time: float = 0.0
 var pulse_speed: float = 3.0
 var pulse_strength: float = 0.2
+
+# --- PLATFORM SUPPORT ---
+var platform: Node = null # Reference to the TurretPlatform the turret is placed on
 
 func _ready() -> void:
 	add_to_group("turrets")
@@ -139,6 +144,11 @@ func remove_slow_effect(enemy: Node) -> void:
 func set_preview(enable: bool) -> void:
 	is_preview = enable
 	if is_preview:
+		# --- PLATFORM LOGIC: Free the platform spot if picking up the turret ---
+		if platform:
+			if platform.has_method("remove_turret"):
+				platform.remove_turret()
+			platform = null
 		store_original_materials_recursive(self)
 		set_active(false)
 		visible = true

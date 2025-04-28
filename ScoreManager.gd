@@ -31,3 +31,8 @@ func purchase_turret(cost: int) -> bool:
 		purchase_failed.emit()
 		print("Purchase failed: Not enough points")
 		return false
+		
+func refund_points(amount: int) -> void:
+	current_score += amount
+	score_changed.emit(current_score) # <-- This updates the UI!
+	print("Refunded points: ", amount, " (Total score: ", current_score, ")")

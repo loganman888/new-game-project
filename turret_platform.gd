@@ -1,5 +1,5 @@
 # TurretPlatform.gd
-extends StaticBody3D # or Area3D, but StaticBody3D is typical for a solid platform
+extends Area3D # or Area3D, but StaticBody3D is typical for a solid platform
 
 @export var snap_point: Vector3 = Vector3.ZERO # Adjust this in the editor as needed
 

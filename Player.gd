@@ -1,20 +1,22 @@
 extends CharacterBody3D
 
+# --- Movement and view parameters ---
 var speed
 const WALK_SPEED = 5.0
 const SPRINT_SPEED = 8.0
 const JUMP_VELOCITY = 4.5
 const SENSITIVITY = 0.005
 
-#BOB variables
+# --- Headbob variables ---
 const BOB_FREQ = 2.8
 const BOB_AMP = 0.02
 var t_bob = 0.0
 
-#fov variables
+# --- FOV (field of view) variables ---
 const BASE_FOV = 75.0
 const FOV_CHANGE = 1.5
 
+# --- Node references ---
 @onready var head = $Head
 @onready var camera = $Head/Camera3D
 @onready var health_lbl: Label = $HealthLbl
@@ -23,32 +25,40 @@ const FOV_CHANGE = 1.5
 
 var gravity = 9.8
 
+# --- Initialize player settings ---
 func _ready():
 	add_to_group("player")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	print("Player initialized")
 
+# --- Handle player input for movement/camera/menu ---
 func _input(event):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		head.rotate_y(-event.relative.x * SENSITIVITY)
 		camera.rotate_x(-event.relative.y * SENSITIVITY)
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(60))
 	
+	# Toggle mouse mode on escape
 	if Input.is_action_just_pressed("ui_cancel"):
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-			
+
+	# Open turret shop menu
 	if Input.is_action_just_pressed("open_turret_menu"):
 		var menu = get_tree().get_first_node_in_group("turret_menu")
 		if menu:
 			menu.toggle_menu()
 
+# --- Main process loop ---
 func _process(_delta: float) -> void:
+	# Update the on-screen health
 	health_lbl.text = str(health_component.health)
+	# Check for turret interaction (pickup)
 	check_turret_interaction()
 
+# --- Handle raycast-based turret interaction and pickup ---
 func check_turret_interaction() -> void:
 	if Input.is_action_just_pressed("interact"):
 		print("\n=== Checking Turret Interaction ===")
@@ -57,7 +67,7 @@ func check_turret_interaction() -> void:
 		var end_pos = camera.global_position + camera.global_transform.basis.z * 10.0
 		
 		var query = PhysicsRayQueryParameters3D.create(start_pos, end_pos)
-		query.collision_mask = 32  # Layer 6 (Pickup)
+		query.collision_mask = 32  # Only hit Layer 6 (Pickup)
 		query.exclude = [self]
 		query.collide_with_areas = true
 		query.collide_with_bodies = false
@@ -66,13 +76,12 @@ func check_turret_interaction() -> void:
 		print("Raycast from: ", start_pos)
 		print("Raycast to: ", end_pos)
 		
-		# Debug all turrets in scene
+		# Debug all turrets in scene for info
 		var all_turrets = get_tree().get_nodes_in_group("turrets")
 		print("All turrets in scene: ", all_turrets)
 		for turret in all_turrets:
 			print("Turret position: ", turret.global_position)
 			print("Distance to turret: ", global_position.distance_to(turret.global_position))
-			
 			if turret.has_node("PickupDetectionArea"):
 				var area = turret.get_node("PickupDetectionArea")
 				print("Pickup area layers: ", area.collision_layer)
@@ -81,12 +90,16 @@ func check_turret_interaction() -> void:
 		var result = space_state.intersect_ray(query)
 		if result:
 			print("Hit something: ", result.collider)
+			# Check if hit something inside a turret node
 			if result.collider.get_parent().is_in_group("turrets"):
 				print("Found turret, attempting pickup")
-				pickup_system.pickup_turret(result.collider.get_parent())
+				var turret = result.collider.get_parent()
+				# --- Advanced method: pass node, shop_type, shop_cost (for flexible cost/refund logic) ---
+				pickup_system.pickup_turret(turret, turret.shop_type, turret.shop_cost)
 		else:
 			print("No hit detected")
 
+# --- Physics and movement ---
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += calculate_gravity() * delta
@@ -122,14 +135,17 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+# --- Camera headbob effect for realism ---
 func _headbob(time) -> Vector3:
 	var pos = Vector3.ZERO
 	pos.y = sin(time * BOB_FREQ) * BOB_AMP
 	pos.x = cos(time * BOB_FREQ / 2) * BOB_AMP
 	return pos
 
+# --- Quit on death ---
 func on_death() -> void:
 	get_tree().quit()
 
+# --- Calculate gravity effect on the body ---
 func calculate_gravity() -> Vector3:
 	return Vector3(0, -gravity, 0)
