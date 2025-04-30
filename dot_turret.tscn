@@ -9,6 +9,7 @@
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_6jx8h"]
 
 [node name="DotTurret" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_g6gla")
 
 [node name="RotationBase" type="Node3D" parent="."]

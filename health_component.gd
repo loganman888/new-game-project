@@ -6,7 +6,8 @@ signal health_changed(current_health, max_health)
 # Enemy type presets
 enum EnemyType {
 	BASIC,
-	CUBE
+	CUBE,
+	HEALER  # Added new enemy type for the healer
 }
 
 @export var enemy_type: EnemyType = EnemyType.BASIC
@@ -22,8 +23,15 @@ func _ready() -> void:
 			MaxHealth = 100.0
 		EnemyType.CUBE:
 			MaxHealth = 150.0
+		EnemyType.HEALER:
+			MaxHealth = 80.0  # Maybe make healers a bit weaker
 	
 	health = MaxHealth
+	emit_signal("health_changed", health, MaxHealth)
+
+func heal(amount: float) -> void:
+	# Increase health but don't exceed max health
+	health = min(health + amount, MaxHealth)
 	emit_signal("health_changed", health, MaxHealth)
 
 func damage(attack: Attack) -> void:

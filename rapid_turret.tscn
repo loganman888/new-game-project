@@ -9,6 +9,7 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_2lrmh"]
 
 [node name="RapidTurret" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_jcxgh")
 
 [node name="RotationBase" type="Node3D" parent="."]
