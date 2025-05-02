@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://df152xnsqmp14"]
+[gd_scene load_steps=6 format=3 uid="uid://df152xnsqmp14"]
 
 [ext_resource type="Script" uid="uid://c0a6hggh0l7w7" path="res://rapid_turret.gd" id="1_jcxgh"]
+[ext_resource type="AudioStream" uid="uid://lbtnimydssi5" path="res://sounds/rapidfireturretshooting.mp3" id="2_kjn25"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_kjn25"]
 
@@ -34,6 +35,10 @@ collision_mask = 32
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PickupDetectionArea"]
 shape = SubResource("BoxShape3D_2lrmh")
+
+[node name="ShootSound" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("2_kjn25")
+volume_db = -10.0
 
 [connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="DetectionArea" to="." method="_on_detection_area_body_exited"]

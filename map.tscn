@@ -1,14 +1,15 @@
-[gd_scene load_steps=15 format=3 uid="uid://bcau8p5se2yi1"]
+[gd_scene load_steps=16 format=3 uid="uid://bcau8p5se2yi1"]
 
 [ext_resource type="PackedScene" uid="uid://tavvx0k43s2n" path="res://player.tscn" id="1_c7s6e"]
 [ext_resource type="Texture2D" uid="uid://ce2gag213v2kx" path="res://assets/696.jpg" id="1_iw27f"]
 [ext_resource type="PackedScene" uid="uid://d1v11i55ngi4a" path="res://dummy.tscn" id="2_wijl4"]
 [ext_resource type="PackedScene" uid="uid://b7q3yflfn6lis" path="res://spawner.tscn" id="3_e0an3"]
-[ext_resource type="PackedScene" uid="uid://cs10owbqkjdab" path="res://turret_menu_ui.tscn" id="4_p5pve"]
-[ext_resource type="PackedScene" uid="uid://cpue3a3gyfksg" path="res://enemy.tscn" id="5_sb2pt"]
+[ext_resource type="PackedScene" uid="uid://bvmataqroijyq" path="res://turret_menu_ui.tscn" id="4_p5pve"]
 [ext_resource type="PackedScene" uid="uid://byxx4crr268hw" path="res://pause_menu.tscn" id="5_urblq"]
-[ext_resource type="PackedScene" uid="uid://bt2eyebc340r3" path="res://healer.tscn" id="6_0t07s"]
+[ext_resource type="PackedScene" uid="uid://cpue3a3gyfksg" path="res://enemy.tscn" id="6_0t07s"]
+[ext_resource type="PackedScene" uid="uid://cartpijb8hnfu" path="res://enemy_cube.tscn" id="6_6qsgm"]
 [ext_resource type="PackedScene" uid="uid://c065s3htgr1ld" path="res://day_night_cycle.tscn" id="7_71pa8"]
+[ext_resource type="PackedScene" uid="uid://bt2eyebc340r3" path="res://healer.tscn" id="7_ooc2g"]
 [ext_resource type="PackedScene" uid="uid://bvvfk055lh5te" path="res://teleporter.tscn" id="8_05x41"]
 [ext_resource type="PackedScene" uid="uid://crb75x2ibkikd" path="res://score_ui.tscn" id="9_gqbix"]
 [ext_resource type="PackedScene" uid="uid://dswf11hjr8klc" path="res://turret_platform.tscn" id="10_oysan"]
@@ -76,15 +77,14 @@ size = Vector3(1.27197, 1, 1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 2.36126, -8)
 
 [node name="dummy" parent="." instance=ExtResource("2_wijl4")]
-transform = Transform3D(-0.528, 0, 0, 0, 1, 0, 0, 0, 1, 1.89624, 0, -17.758)
+transform = Transform3D(-0.528, 0, 0, 0, 1, 0, 0, 0, 1, 52.8962, 0, 39.242)
 
 [node name="Spawner" parent="." instance=ExtResource("3_e0an3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.1, 44, 1, -43)
-enemy_scenes = Array[PackedScene]([ExtResource("5_sb2pt"), ExtResource("6_0t07s")])
-spawn_interval = 1.0
+enemy_scenes = Array[PackedScene]([ExtResource("6_0t07s"), ExtResource("6_6qsgm"), ExtResource("7_ooc2g")])
 max_enemies = 5
 spawn_radius = 2.0
-initial_spawn_delay = 2.0
+initial_spawn_delay = 10.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

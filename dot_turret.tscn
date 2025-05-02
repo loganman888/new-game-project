@@ -1,6 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://daoccxoho6yr4"]
+[gd_scene load_steps=8 format=3 uid="uid://daoccxoho6yr4"]
 
 [ext_resource type="Script" uid="uid://ce5xk4qv850b6" path="res://dot_turret.gd" id="1_g6gla"]
+[ext_resource type="AudioStream" uid="uid://c0do2vdxyu14n" path="res://sounds/DOT turret.mp3" id="2_fuk4m"]
+[ext_resource type="AudioStream" uid="uid://c0roau6q10pr5" path="res://sounds/DOT Activation.mp3" id="2_ytqx2"]
+[ext_resource type="AudioStream" uid="uid://tk0ii05ecjkh" path="res://sounds/DOT powering down.mp3" id="4_d1vtj"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_vxp1n"]
 
@@ -34,6 +37,18 @@ collision_mask = 32
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PickupDetectionArea"]
 shape = SubResource("CylinderShape3D_6jx8h")
+
+[node name="ActivationSound" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("2_ytqx2")
+volume_db = -30.0
+
+[node name="EffectSound" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("2_fuk4m")
+volume_db = -30.0
+
+[node name="WindDownSound" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("4_d1vtj")
+volume_db = -30.0
 
 [connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="DetectionArea" to="." method="_on_detection_area_body_exited"]

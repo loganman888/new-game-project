@@ -4,3 +4,5 @@
 
 [node name="HealthComponent" type="Node"]
 script = ExtResource("1_n21r7")
+enemy_type = 1
+MaxHealth = 200.0

@@ -23,6 +23,11 @@ const FOV_CHANGE = 1.5
 @onready var health_component: Node = $HealthComponent
 @onready var pickup_system = $PickupSystem
 
+# --- Camera control variables ---
+var is_in_targeting_mode: bool = false
+var camera_original_parent: Node
+var camera_original_transform: Transform3D
+
 var gravity = 9.8
 
 # --- Initialize player settings ---
@@ -33,6 +38,9 @@ func _ready():
 
 # --- Handle player input for movement/camera/menu ---
 func _input(event):
+	if is_in_targeting_mode:
+		return
+		
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		head.rotate_y(-event.relative.x * SENSITIVITY)
 		camera.rotate_x(-event.relative.y * SENSITIVITY)
@@ -101,6 +109,10 @@ func check_turret_interaction() -> void:
 
 # --- Physics and movement ---
 func _physics_process(delta: float) -> void:
+	if is_in_targeting_mode:
+		handle_targeting_camera_movement(delta)
+		return
+		
 	if not is_on_floor():
 		velocity += calculate_gravity() * delta
 
@@ -134,6 +146,62 @@ func _physics_process(delta: float) -> void:
 	camera.fov = lerp(camera.fov, target_fov, delta * 8.0)
 
 	move_and_slide()
+
+# --- New targeting mode camera movement ---
+func handle_targeting_camera_movement(delta: float) -> void:
+	var move_speed = 20.0
+	var movement = Vector3.ZERO
+	
+	if Input.is_action_pressed("forward"):
+		movement.z -= 1
+	if Input.is_action_pressed("back"):
+		movement.z += 1
+	if Input.is_action_pressed("left"):
+		movement.x -= 1
+	if Input.is_action_pressed("right"):
+		movement.x += 1
+	
+	if movement != Vector3.ZERO:
+		movement = movement.normalized() * move_speed * delta
+		camera.global_position += movement
+
+# --- New targeting mode camera control ---
+func enter_targeting_mode(height: float, tilt: float, position: Vector3) -> void:
+	is_in_targeting_mode = true
+	
+	# Store original camera data
+	camera_original_parent = camera.get_parent()
+	camera_original_transform = camera.global_transform
+	
+	# Temporarily reparent camera to root to avoid head rotation influence
+	camera_original_parent.remove_child(camera)
+	get_tree().get_root().add_child(camera)
+	
+	# Set camera to fixed position and rotation
+	camera.global_position = position
+	camera.global_rotation = Vector3.ZERO
+	camera.rotation_degrees.x = tilt
+	camera.rotation_degrees.y = 0
+	camera.rotation_degrees.z = 0
+	
+	# Show mouse
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func exit_targeting_mode() -> void:
+	is_in_targeting_mode = false
+	
+	# Restore camera to original parent and transform
+	if camera and camera_original_parent:
+		# Remove from current parent
+		if camera.get_parent():
+			camera.get_parent().remove_child(camera)
+		
+		# Restore to original parent and transform
+		camera_original_parent.add_child(camera)
+		camera.global_transform = camera_original_transform
+	
+	# Reset mouse mode
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 # --- Camera headbob effect for realism ---
 func _headbob(time) -> Vector3:

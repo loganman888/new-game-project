@@ -9,12 +9,14 @@ extends Node3D
 @export var rotation_speed: float = 5.0
 @export var shop_type: String = "Basic Turret"
 @export var shop_cost: int = 50
+
 # Node references
 @onready var rotation_base = $RotationBase
 @onready var turret_model = $RotationBase/TurretModel
 @onready var detection_area = $DetectionArea
 @onready var pickup_area = $PickupDetectionArea
 @onready var projectile_spawn = $RotationBase/ProjectileSpawn
+@onready var shoot_sound = $ShootSound
 
 # Preload the projectile scene
 @onready var projectile_scene = preload("res://projectile.tscn")
@@ -179,6 +181,10 @@ func shoot_at_target() -> void:
 	projectile.global_position = projectile_spawn.global_position
 	
 	projectile.initialize(current_target, damage, projectile_speed, self)
+	
+	# Play shooting sound
+	if shoot_sound:
+		shoot_sound.play()
 	
 	can_attack = false
 	await get_tree().create_timer(attack_cooldown).timeout

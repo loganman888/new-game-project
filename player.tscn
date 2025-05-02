@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://tavvx0k43s2n"]
+[gd_scene load_steps=8 format=3 uid="uid://tavvx0k43s2n"]
 
 [ext_resource type="Script" uid="uid://cb3okylncee1k" path="res://Player.gd" id="1_i3pqv"]
 [ext_resource type="Script" uid="uid://l0r4mjgwfgtq" path="res://pickup_system.gd" id="3_i3pqv"]
 [ext_resource type="PackedScene" uid="uid://cfuxub1menc4r" path="res://health_component.tscn" id="3_sweqy"]
+[ext_resource type="AudioStream" uid="uid://b6g1a6wxgj0mi" path="res://sounds/Drill (2).mp3" id="4_hqtel"]
+[ext_resource type="AudioStream" uid="uid://cshuvbj1mbrqo" path="res://sounds/Coins.mp3" id="5_sweqy"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_036b0"]
 
@@ -31,6 +33,12 @@ offset_bottom = 23.0
 
 [node name="PickupSystem" type="Node3D" parent="."]
 script = ExtResource("3_i3pqv")
+
+[node name="PlacementSound" type="AudioStreamPlayer3D" parent="PickupSystem"]
+stream = ExtResource("4_hqtel")
+
+[node name="CancelSound" type="AudioStreamPlayer3D" parent="PickupSystem"]
+stream = ExtResource("5_sweqy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1, 0, 0.65805, 0)

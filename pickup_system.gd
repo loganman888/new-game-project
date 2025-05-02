@@ -1,6 +1,8 @@
 extends Node3D
 
 @onready var camera = $"../Head/Camera3D"
+@onready var placement_sound = $PlacementSound
+@onready var cancel_sound = $CancelSound
 
 var current_turret: Node3D = null
 var current_platform: Node3D = null
@@ -107,6 +109,11 @@ func place_turret() -> void:
 	current_turret.platform = placement_platform
 	current_turret.set_preview(false)
 	current_turret.set_active(true)
+	
+	# Play the placement sound
+	if placement_sound:
+		placement_sound.play()
+	
 	current_turret = null
 	placement_platform = null
 	held_item_type = ""
@@ -116,6 +123,11 @@ func cancel_turret_placement() -> void:
 	if current_turret:
 		if held_item_cost > 0:
 			ScoreManager.refund_points(int(held_item_cost * 0.5))
+		
+		# Play cancel sound
+		if cancel_sound:
+			cancel_sound.play()
+			
 		current_turret.queue_free()
 		current_turret = null
 		held_item_type = ""
@@ -174,6 +186,11 @@ func place_platform() -> void:
 		return
 	if current_platform.has_method("set_preview"):
 		current_platform.set_preview(false)
+	
+	# Play the placement sound
+	if placement_sound:
+		placement_sound.play()
+		
 	current_platform = null
 	placement_valid = false
 	held_item_type = ""
@@ -183,6 +200,11 @@ func cancel_platform_placement() -> void:
 	if current_platform:
 		if held_item_cost > 0:
 			ScoreManager.refund_points(held_item_cost)
+			
+		# Play cancel sound
+		if cancel_sound:
+			cancel_sound.play()
+			
 		current_platform.queue_free()
 		current_platform = null
 		placement_valid = false

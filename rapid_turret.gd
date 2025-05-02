@@ -16,6 +16,7 @@ extends Node3D
 @onready var detection_area = $DetectionArea
 @onready var pickup_area = $PickupDetectionArea
 @onready var projectile_spawn = $RotationBase/ProjectileSpawn
+@onready var shoot_sound = $ShootSound  # New audio reference
 
 # Preload the projectile scene
 @onready var projectile_scene = preload("res://projectile.tscn")
@@ -180,6 +181,11 @@ func shoot_at_target() -> void:
 	projectile.global_position = projectile_spawn.global_position
 	
 	projectile.initialize(current_target, damage, projectile_speed, self)
+	
+	# Play the shooting sound with slight pitch variation
+	if shoot_sound:
+		shoot_sound.pitch_scale = randf_range(0.95, 1.05)  # Adds variety to the sound
+		shoot_sound.play()
 	
 	can_attack = false
 	await get_tree().create_timer(attack_cooldown).timeout

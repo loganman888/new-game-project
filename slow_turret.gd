@@ -8,6 +8,9 @@ extends Node3D
 @export var shop_cost: int = 100
 
 # Node references
+@onready var activation_sound = $ActivationSound
+@onready var effect_sound = $EffectSound
+@onready var wind_down_sound = $WindDownSound
 @onready var rotation_base = $RotationBase
 @onready var turret_model = $RotationBase/TurretModel
 @onready var detection_area = $DetectionArea
@@ -19,6 +22,9 @@ var is_preview: bool = false
 var original_materials: Dictionary = {}
 var affected_enemies: Dictionary = {}  # Keep track of affected enemies and their original speeds
 var range_indicator: MeshInstance3D
+var enemies_in_range: int = 0
+var effect_sound_playing: bool = false
+var is_winding_down: bool = false
 
 # Visual effect variables
 var pulse_time: float = 0.0
@@ -90,6 +96,14 @@ func setup_range_indicator() -> void:
 
 func _process(delta: float) -> void:
 	if !is_active or is_preview:
+		# Stop sounds if they're playing and we're not active
+		if effect_sound_playing:
+			effect_sound.stop()
+			effect_sound_playing = false
+		if wind_down_sound and wind_down_sound.playing:
+			wind_down_sound.stop()
+			is_winding_down = false
+		
 		# Pulse effect for range indicator during preview
 		if range_indicator and range_indicator.visible:
 			pulse_time += delta * pulse_speed
@@ -102,6 +116,15 @@ func _process(delta: float) -> void:
 				var alpha = range_indicator_color.a * (0.8 + (sin(pulse_time) * 0.2))
 				material.albedo_color.a = alpha
 		return
+	
+	# Handle effect sound
+	if enemies_in_range > 0 and !effect_sound_playing and effect_sound:
+		if is_winding_down:
+			# If we're winding down, wait for it to finish
+			await wind_down_sound.finished
+			is_winding_down = false
+		effect_sound.play()
+		effect_sound_playing = true
 	
 	# Update affected enemies
 	update_affected_enemies()
@@ -141,10 +164,38 @@ func remove_slow_effect(enemy: Node) -> void:
 			enemy.set_speed(affected_enemies[enemy])  # Restore original speed
 		affected_enemies.erase(enemy)
 
+func _on_detection_area_body_entered(body: Node3D) -> void:
+	if !is_active or !body.is_in_group("enemies"):
+		return
+	
+	enemies_in_range += 1
+	
+	# Play activation sound when first enemy enters range
+	if enemies_in_range == 1 and activation_sound:
+		activation_sound.play()
+
+func _on_detection_area_body_exited(body: Node3D) -> void:
+	if !is_active or !body.is_in_group("enemies"):
+		return
+	
+	enemies_in_range = max(0, enemies_in_range - 1)
+	
+	# When the last enemy exits, play wind down sound
+	if enemies_in_range == 0:
+		if effect_sound:
+			effect_sound.stop()
+			effect_sound_playing = false
+		
+		if wind_down_sound and !is_winding_down:
+			is_winding_down = true
+			wind_down_sound.play()
+			# Wait for wind down sound to finish
+			await wind_down_sound.finished
+			is_winding_down = false
+
 func set_preview(enable: bool) -> void:
 	is_preview = enable
 	if is_preview:
-		# --- PLATFORM LOGIC: Free the platform spot if picking up the turret ---
 		if platform:
 			if platform.has_method("remove_turret"):
 				platform.remove_turret()
@@ -167,6 +218,15 @@ func set_active(active: bool) -> void:
 	set_physics_process(active)
 	
 	if !active:
+		# Stop all sounds when turret becomes inactive
+		if effect_sound_playing and effect_sound:
+			effect_sound.stop()
+			effect_sound_playing = false
+		if wind_down_sound and wind_down_sound.playing:
+			wind_down_sound.stop()
+		is_winding_down = false
+		enemies_in_range = 0
+		
 		# Remove slow effect from all affected enemies when deactivated
 		var enemies_to_remove = affected_enemies.keys()
 		for enemy in enemies_to_remove:

@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://crb75x2ibkikd" path="res://score_ui.tscn" id="9_ioo17"]
 [ext_resource type="PackedScene" uid="uid://dhmuglnnbucmr" path="res://health_bar.tscn" id="10_cbp6q"]
 [ext_resource type="PackedScene" uid="uid://b20mscmoltnma" path="res://turret.tscn" id="10_ic0uy"]
-[ext_resource type="PackedScene" uid="uid://cs10owbqkjdab" path="res://turret_menu_ui.tscn" id="10_wse8f"]
+[ext_resource type="PackedScene" uid="uid://bvmataqroijyq" path="res://turret_menu_ui.tscn" id="10_wse8f"]
 [ext_resource type="PackedScene" uid="uid://df152xnsqmp14" path="res://rapid_turret.tscn" id="11_ic0uy"]
 [ext_resource type="PackedScene" uid="uid://c66wwcmtmi5wj" path="res://slow_turret.tscn" id="12_k3n1d"]
 [ext_resource type="PackedScene" uid="uid://bvvfk055lh5te" path="res://teleporter.tscn" id="13_2o6r5"]
