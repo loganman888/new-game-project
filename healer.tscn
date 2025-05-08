@@ -11,7 +11,7 @@
 size = Vector3(1, 1.5011, 1)
 
 [node name="Healer" type="CharacterBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.43697, 0)
 collision_layer = 5
 collision_mask = 17
 script = ExtResource("1_jqhlo")

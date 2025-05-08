@@ -69,6 +69,57 @@ func _ready() -> void:
 	# Create range indicator only
 	create_range_indicator()
 
+func _input(event: InputEvent) -> void:
+	if not is_active or is_preview or not can_interact:
+		return
+		
+	if event.is_action_pressed("use"):
+		var player = get_tree().get_first_node_in_group("player")
+		if not player:
+			return
+			
+		# Get the camera and check if player is looking at the turret
+		var camera = player.get_node_or_null("Head/Camera3D")
+		if not camera:
+			print("Camera not found")
+			return
+			
+		# Setup raycast from camera
+		var space_state = get_world_3d().direct_space_state
+		var start_pos = camera.global_position
+		var end_pos = start_pos - camera.global_transform.basis.z * interaction_distance
+		
+		var query = PhysicsRayQueryParameters3D.create(start_pos, end_pos)
+		query.exclude = [player]
+		query.collide_with_areas = true
+		query.collide_with_bodies = true
+		
+		var result = space_state.intersect_ray(query)
+		
+		if result:
+			# Check if we hit this turret or its collision area
+			var hit_node = result.collider
+			while hit_node:
+				if hit_node == self or hit_node == detection_area:
+					if not is_targeting_mode and global_position.distance_to(player.global_position) <= interaction_distance:
+						enter_targeting_mode()
+					break
+				hit_node = hit_node.get_parent()
+	
+	# Only handle mouse clicks when in targeting mode
+	elif is_targeting_mode:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				# Confirm target location and apply damage
+				apply_damage_at_preview()
+				exit_targeting_mode()
+			elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+				# Cancel targeting mode
+				exit_targeting_mode()
+		# Keep escape as an additional way to cancel
+		elif event.is_action_pressed("ui_cancel"):
+			exit_targeting_mode()
+
 func create_range_indicator() -> void:
 	range_indicator = MeshInstance3D.new()
 	add_child(range_indicator)
@@ -117,60 +168,6 @@ func create_targeting_indicator() -> void:
 	material.emission = Color(1.0, 0.0, 0.0)
 	targeting_indicator.material_override = material
 	targeting_indicator.visible = false
-
-func play_fire_sound() -> void:
-	if fire_sound:
-		fire_sound.play()
-
-func play_impact_sound_at_location(position: Vector3) -> void:
-	# Create temporary audio player at target location
-	var temp_audio = AudioStreamPlayer3D.new()
-	get_tree().get_root().add_child(temp_audio)
-	
-	# Copy properties from the impact audio player
-	if impact_sound:
-		temp_audio.stream = impact_sound.stream
-		temp_audio.volume_db = impact_sound.volume_db
-		temp_audio.max_distance = impact_sound.max_distance
-		temp_audio.attenuation_model = impact_sound.attenuation_model
-	
-	# Position the audio player
-	temp_audio.global_position = position
-	
-	# Play the sound
-	temp_audio.play()
-	
-	# Wait for sound to finish and then remove
-	await temp_audio.finished
-	temp_audio.queue_free()
-
-func _input(event: InputEvent) -> void:
-	if not is_active or is_preview or not can_interact:
-		return
-		
-	if event.is_action_pressed("use"):
-		var player = get_tree().get_first_node_in_group("player")
-		if not player:
-			return
-			
-		if not is_targeting_mode:
-			# Check if player is close enough to interact
-			if global_position.distance_to(player.global_position) <= interaction_distance:
-				enter_targeting_mode()
-	
-	# Only handle mouse clicks when in targeting mode
-	elif is_targeting_mode:
-		if event is InputEventMouseButton:
-			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-				# Confirm target location and apply damage
-				apply_damage_at_preview()
-				exit_targeting_mode()
-			elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-				# Cancel targeting mode
-				exit_targeting_mode()
-		# Keep escape as an additional way to cancel
-		elif event.is_action_pressed("ui_cancel"):
-			exit_targeting_mode()
 
 func _process(delta: float) -> void:
 	if !is_active or is_preview:
@@ -230,6 +227,32 @@ func exit_targeting_mode() -> void:
 	# Return player's camera to normal
 	if player and player.has_method("exit_targeting_mode"):
 		player.exit_targeting_mode()
+
+func play_fire_sound() -> void:
+	if fire_sound:
+		fire_sound.play()
+
+func play_impact_sound_at_location(position: Vector3) -> void:
+	# Create temporary audio player at target location
+	var temp_audio = AudioStreamPlayer3D.new()
+	get_tree().get_root().add_child(temp_audio)
+	
+	# Copy properties from the impact audio player
+	if impact_sound:
+		temp_audio.stream = impact_sound.stream
+		temp_audio.volume_db = impact_sound.volume_db
+		temp_audio.max_distance = impact_sound.max_distance
+		temp_audio.attenuation_model = impact_sound.attenuation_model
+	
+	# Position the audio player
+	temp_audio.global_position = position
+	
+	# Play the sound
+	temp_audio.play()
+	
+	# Wait for sound to finish and then remove
+	await temp_audio.finished
+	temp_audio.queue_free()
 
 func apply_damage_at_preview() -> void:
 	var damage_position = targeting_indicator.global_position

@@ -1,3 +1,4 @@
+# pause_menu.gd
 extends Control
 
 func _ready():
@@ -18,6 +19,23 @@ func toggle_menu():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _on_restart_pressed() -> void:
+	# Reset score using ScoreManager
+	ScoreManager.reset_score()
+	
+	# Remove all turrets
+	var turrets = get_tree().get_nodes_in_group("turrets")
+	for turret in turrets:
+		turret.queue_free()
+		
+	# Reset all platforms
+	var platforms = get_tree().get_nodes_in_group("turret_platforms")
+	for platform in platforms:
+		platform.is_locked = true
+		if platform.placed_turret:
+			platform.placed_turret.queue_free()
+		platform.placed_turret = null
+	
+	# Unpause and reload scene
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 

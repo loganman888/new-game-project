@@ -6,13 +6,13 @@
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5ojrs"]
 
-[node name="TurretPlatform" type="Area3D"]
+[node name="TurretPlatform" type="Area3D" groups=["turret_platforms"]]
 script = ExtResource("1_5ojrs")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1.5, 0, 0, 0, 0.18, 0, 0, 0, 1.7, 0, 0, 0)
 mesh = SubResource("BoxMesh_kqgyu")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.3, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1.54371, 0, 0, 0, 0.381486, 0, 0, 0, 1.8, 0, 0, 0)
 shape = SubResource("BoxShape3D_5ojrs")

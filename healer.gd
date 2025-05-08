@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+signal died
+
 const SCORE_VALUE: int = 100
 
 @export var speed := 10.0
@@ -22,10 +24,13 @@ var new_velocity: Vector3
 var base_speed: float
 var current_speed: float
 var slow_factor: float = 1.0
+var is_dead = false
+var spawn_time: float = 0.0
 
 func _ready() -> void:
 	base_speed = speed
 	current_speed = base_speed
+	spawn_time = Time.get_ticks_msec() / 1000.0  # Current time in seconds
 	add_to_group("enemies")
 	
 	motion_mode = MOTION_MODE_GROUNDED
@@ -167,7 +172,7 @@ func heal_nearby_enemies() -> void:
 						model.modulate = Color.WHITE
 
 func on_death() -> void:
-	# Heal nearby enemies before dying
+	emit_signal("died")
 	heal_nearby_enemies()
 	
 	# Original death behavior
@@ -178,3 +183,14 @@ func apply_damage(amount: float) -> void:
 	if health_component:
 		health_component.damage(Attack.new(amount, self))
 		on_damage(Attack.new(amount, self))
+		
+func die():
+	if is_dead:
+		return
+		
+	is_dead = true
+	emit_signal("died")
+
+func get_spawn_time() -> float:
+	return spawn_time
+	

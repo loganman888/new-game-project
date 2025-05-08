@@ -1,15 +1,21 @@
-# score_manager.gd
+# ScoreManager.gd
 extends Node
 
 signal score_changed(new_score: int)
 signal purchase_failed
 
-var current_score: int = 500  # Start with 500 points
+const DEFAULT_SCORE: int = 500  # Default starting score
+var current_score: int = DEFAULT_SCORE
 
 func _ready() -> void:
 	# Emit initial score
 	score_changed.emit(current_score)
 	print("ScoreManager initialized with score: ", current_score)
+
+func reset_score() -> void:
+	current_score = DEFAULT_SCORE
+	score_changed.emit(current_score)
+	print("Score reset to default: ", current_score)
 
 func add_score(points: int) -> void:
 	current_score += points
@@ -34,5 +40,5 @@ func purchase_turret(cost: int) -> bool:
 		
 func refund_points(amount: int) -> void:
 	current_score += amount
-	score_changed.emit(current_score) # <-- This updates the UI!
+	score_changed.emit(current_score)
 	print("Refunded points: ", amount, " (Total score: ", current_score, ")")

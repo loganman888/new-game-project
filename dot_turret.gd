@@ -110,14 +110,19 @@ func _process(delta: float) -> void:
 				material.albedo_color.a = alpha
 		return
 	
-	# Handle effect sound
-	if enemies_in_range > 0 and !effect_sound_playing and effect_sound:
-		if is_winding_down:
-			# If we're winding down, wait for it to finish
-			await wind_down_sound.finished
-			is_winding_down = false
-		effect_sound.play()
-		effect_sound_playing = true
+	# Handle effect sound based on enemies in range
+	if enemies_in_range > 0:
+		if !effect_sound_playing and effect_sound:
+			if is_winding_down:
+				# If we're winding down, wait for it to finish
+				await wind_down_sound.finished
+				is_winding_down = false
+			effect_sound.play()
+			effect_sound_playing = true
+	else:
+		if effect_sound_playing and effect_sound:
+			effect_sound.stop()
+			effect_sound_playing = false
 	
 	# Deal DoT to enemies in detection area
 	apply_damage_to_enemies(delta)
@@ -157,11 +162,7 @@ func _on_detection_area_body_exited(body: Node3D) -> void:
 		if wind_down_sound and !is_winding_down:
 			is_winding_down = true
 			wind_down_sound.play()
-			# Wait for wind down sound to finish
-			await wind_down_sound.finished
-			is_winding_down = false
 
-# PLATFORM LOGIC
 func set_preview(enable: bool) -> void:
 	is_preview = enable
 	if is_preview:

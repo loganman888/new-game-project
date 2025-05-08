@@ -157,14 +157,38 @@ func find_new_target() -> Node3D:
 	if !is_active or !detection_area or !detection_area.monitoring:
 		return null
 	var bodies = detection_area.get_overlapping_bodies()
-	return find_closest_enemy(bodies)
+	return find_oldest_enemy(bodies)
 
+# NEW FUNCTION: Find the oldest enemy (spawned first)
+func find_oldest_enemy(bodies: Array) -> Node3D:
+	var oldest_enemy: Node3D = null
+	var oldest_spawn_time: float = INF
+	
+	for body in bodies:
+		if is_instance_valid(body) and body.is_in_group("enemies") and body.is_inside_tree():
+			# First try to use spawn_time if available
+			if body.has_method("get_spawn_time") or body.get("spawn_time") != null:
+				var spawn_time = body.get_spawn_time() if body.has_method("get_spawn_time") else body.spawn_time
+				if spawn_time < oldest_spawn_time:
+					oldest_spawn_time = spawn_time
+					oldest_enemy = body
+			# Fallback to using the object ID as a proxy for creation order
+			elif oldest_enemy == null or body.get_instance_id() < oldest_enemy.get_instance_id():
+				oldest_enemy = body
+	
+	# If no enemy found with the "oldest" method, fall back to closest
+	if oldest_enemy == null:
+		return find_closest_enemy(bodies)
+				
+	return oldest_enemy
+
+# Keep the original function as a fallback
 func find_closest_enemy(bodies: Array) -> Node3D:
-	var closest_enemy = null
+	var closest_enemy: Node3D = null
 	var closest_distance = attack_range
 
 	for body in bodies:
-		if body.is_in_group("enemies"):
+		if is_instance_valid(body) and body.is_in_group("enemies") and body.is_inside_tree():
 			var distance = global_position.distance_to(body.global_position)
 			if distance < closest_distance:
 				closest_distance = distance
@@ -194,10 +218,10 @@ func _on_detection_area_body_entered(body: Node3D) -> void:
 	if !is_active:
 		return
 	if body.is_in_group("enemies") and not current_target:
-		current_target = find_closest_enemy(detection_area.get_overlapping_bodies())
+		current_target = find_oldest_enemy(detection_area.get_overlapping_bodies())
 
 func _on_detection_area_body_exited(body: Node3D) -> void:
 	if !is_active:
 		return
 	if body == current_target:
-		current_target = find_closest_enemy(detection_area.get_overlapping_bodies())
+		current_target = find_oldest_enemy(detection_area.get_overlapping_bodies())

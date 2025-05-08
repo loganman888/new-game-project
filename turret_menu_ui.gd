@@ -73,8 +73,10 @@ var TURRET_INFO = {
 }
 
 func _ready():
+	add_to_group("turret_menu")
 	visible = false
 	pickup_system = get_tree().get_first_node_in_group("pickup_system")
+	notify_pickup_system_menu_state()
 	
 	var screen_size = get_viewport().get_visible_rect().size
 	var panel = $Panel
@@ -95,6 +97,14 @@ func _ready():
 	grid_container.add_theme_constant_override("v_separation", 5)
 	
 	setup_turret_buttons()
+
+func notify_pickup_system_menu_state():
+	if pickup_system:
+		pickup_system.set_turret_menu_open(visible)
+
+func _notification(what):
+	if what == NOTIFICATION_VISIBILITY_CHANGED:
+		notify_pickup_system_menu_state()
 
 func setup_turret_buttons():
 	for child in grid_container.get_children():
@@ -176,9 +186,19 @@ func _on_item_button_pressed(item_name: String):
 				pickup_system.pickup_turret(new_item, data.type, cost)
 			toggle_menu()
 
-func _input(event):
+# In your turret menu script, replace the _input function with this:
+func _unhandled_input(event):
 	if event.is_action_pressed("open_turret_menu"):
 		toggle_menu()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("mouse_right") and visible:
+		# Stop the event from propagating
+		get_viewport().set_input_as_handled()
+		accept_event()
+		# Close the menu
+		toggle_menu()
+		# Prevent further processing
+		return
 
 func toggle_menu():
 	visible = !visible
@@ -187,3 +207,12 @@ func toggle_menu():
 		setup_turret_buttons()
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	notify_pickup_system_menu_state()
+	
+	
+func _input(event):
+	if event.is_action_pressed("open_turret_menu"):
+		toggle_menu()
+	elif event.is_action_pressed("mouse_right") and visible:
+		toggle_menu()
+		get_viewport().set_input_as_handled()
